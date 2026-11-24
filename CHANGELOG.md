@@ -1,5 +1,22 @@
 # Changelog
 
+## 3.3.2
+Minor change.
+
+### Fixed
+- Typing in the panel's text boxes (favorite name, passcode, private channel name, search) no longer keys the mic when the transmit key letter is typed. The panel tells rsg-voice while a text box has focus (needs **rsg-voice 3.4.0+**; older versions just ignore it).
+- The panel hint shows the real transmit key from rsg-voice (`Config.Radio.Key`) instead of the fixed `Config.TransmitKeyLabel`, which is now only the fallback.
+- `Config.PushToTalkControls` missing from the config no longer errors while the panel is open.
+
+### Removed
+- Three separate `RSGCore:Client:OnPlayerUnload` handlers, merged into one.
+
+## 3.3.1
+Minor change.
+
+### Fixed
+- Hovering a row in the recents, favorites or channel lists no longer makes the box grow: the 2 px hover shift pushed the row past the list edge and added a scrollbar. Hover now only brightens the row, long names are cut off with an ellipsis, and the lists and panel never scroll sideways.
+
 ## 3.3.0
 Major update.
 

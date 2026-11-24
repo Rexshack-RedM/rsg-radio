@@ -83,7 +83,8 @@ Config.AutoDatabase = true
 -- Seconds between checks that connected players still own the radio and still have access to their channel
 Config.CheckInterval = 10
 
--- Shown in the hint. Must match rsg-voice's Config.Radio.TalkKey.
+-- Shown in the hint when rsg-voice cannot tell the key (older rsg-voice, or Config.Radio.UseKeyMapping = false).
+-- With rsg-voice 3.3.1+ the hint uses rsg-voice's Config.Radio.Key automatically.
 Config.TransmitKeyLabel = 'O'
 
 -- While the radio is open, block game controls but allow push-to-talk and the radio transmit key.

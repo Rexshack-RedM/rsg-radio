@@ -19,7 +19,7 @@ html,body{margin:0;width:100%;height:100%;background:transparent;overflow:hidden
              linear-gradient(160deg,var(--rdr-panel-2),var(--rdr-panel) 60%,var(--rdr-black));
   box-shadow:0 20px 60px var(--rdr-shadow),inset 0 0 40px rgba(0,0,0,.5);color:var(--rdr-text);
 }
-#radio{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:380px;max-height:92vh;overflow-y:auto;box-sizing:border-box;padding:18px 20px 20px;pointer-events:auto}
+#radio{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:380px;max-height:92vh;overflow-x:hidden;overflow-y:auto;box-sizing:border-box;padding:18px 20px 20px;pointer-events:auto}
 #radio::-webkit-scrollbar{width:4px}#radio::-webkit-scrollbar-thumb{background:var(--rdr-gold-dim)}
 .hdr{display:flex;align-items:center;justify-content:space-between;cursor:move}
 .hdr .cbtn{cursor:pointer}
@@ -67,14 +67,16 @@ html,body{margin:0;width:100%;height:100%;background:transparent;overflow:hidden
 .wbtn:hover{border-color:var(--rdr-gold);filter:brightness(1.3)}
 .wbtn.mut{background:linear-gradient(180deg,#1c1c1c,#0a0a0a);color:var(--rdr-muted)}
 .wbtn:disabled{opacity:.45;cursor:not-allowed;filter:none}
-.list{display:flex;flex-direction:column;gap:6px;max-height:96px;overflow-y:auto}
+.list{display:flex;flex-direction:column;gap:6px;max-height:96px;overflow-x:hidden;overflow-y:auto}
 .list::-webkit-scrollbar{width:4px}.list::-webkit-scrollbar-thumb{background:var(--rdr-gold-dim)}
 .row{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:2px;border:1px solid rgba(201,162,75,.18);
      background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(0,0,0,.15));transition:all .15s ease}
-.row:hover{border-color:var(--rdr-gold-dim);transform:translateX(2px)}
+.row{min-width:0;box-sizing:border-box;flex-shrink:0}
+.row:hover{border-color:var(--rdr-gold-dim);background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(0,0,0,.1))} /* no transform: it pushed rows past the list edge and made scrollbars appear */
+.row>.badge,.row>.wbtn,.row>.cbtn,.row>.pill{flex-shrink:0}
 .badge{min-width:30px;height:30px;padding:0 9px;box-sizing:border-box;border-radius:15px;border:1px solid var(--rdr-gold-dim);
        background:radial-gradient(circle,#2e2e2e,#0a0a0a);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
-.row .n{flex:1;font-size:14px;font-weight:500}
+.row .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:500}
 .empty{padding:8px 4px;font-size:12.5px;font-style:italic;color:var(--rdr-muted);text-align:center}
 .foot{margin-top:16px;text-align:center;font-size:11.5px;font-style:italic;color:var(--rdr-muted)}
 #admin{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:780px;max-width:96vw;max-height:92vh;display:flex;flex-direction:column;box-sizing:border-box;padding:18px 20px 16px;pointer-events:auto}
@@ -341,6 +343,9 @@ $('list').addEventListener('click',listClick);
 $('favs').addEventListener('click',listClick);
 $('recs').addEventListener('click',listClick);
 $('plist').addEventListener('click',listClick);
+// typing in a text box must not key the radio mic (the transmit key is an ordinary letter)
+document.addEventListener('focusin',e=>{if(e.target&&e.target.tagName==='INPUT')post('typing',{state:true});});
+document.addEventListener('focusout',e=>{if(e.target&&e.target.tagName==='INPUT')post('typing',{state:false});});
 document.addEventListener('keydown',e=>{
   if(e.key!=='Escape')return;
   if(modalOpen()){closeModal();return;}

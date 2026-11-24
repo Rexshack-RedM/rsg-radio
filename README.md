@@ -2,7 +2,7 @@
 
 Field radio for **RSG Framework (RedM)**, built on [rsg-voice](https://github.com/Rexshack-RedM/rsg-voice). Players with a radio item tune to a frequency and talk to everyone else on it, at any distance. Lawmen, medics (or any job, job type or gang you configure) get restricted channels.
 
-Version 3.3.0 · Requires rsg-core 3.0.3+, rsg-inventory, oxmysql and rsg-voice 3.2.0+ (radio volume, mute, signal and call priority; 3.3.0+ for the volume test). Full reference: [DOCS.md](DOCS.md).
+Version 3.3.2 · Requires rsg-core 3.0.3+, rsg-inventory, oxmysql and rsg-voice 3.2.0+ (radio volume, mute, signal and call priority; 3.3.0+ for the volume test). Full reference: [DOCS.md](DOCS.md).
 
 ---
 
@@ -86,7 +86,7 @@ The private channel table `rsg_radio_private` is created automatically on first 
 | `Config.Staff` | `{ Permission = 'admin', MuteMinutes = 10, Webhook = '' }` | Staff command permission, default block length and optional Discord webhook |
 | `Config.AutoDatabase` | `true` | Create the `rsg_radio_private` table on start (false = import `install.sql`) |
 | `Config.CheckInterval` | `10` | Seconds between checks that radio and access are still valid |
-| `Config.TransmitKeyLabel` | `'O'` | Key name shown in the hint. Keep in line with rsg-voice `Config.Radio.Key` |
+| `Config.TransmitKeyLabel` | `'O'` | Key name shown in the hint when rsg-voice cannot report it (older rsg-voice or `UseKeyMapping = false`). With rsg-voice 3.4.0+ the hint follows rsg-voice's `Config.Radio.Key` |
 | `Config.AllowPushToTalkWhileOpen` | `true` | Keep push-to-talk and the transmit key working while the panel is open |
 | `Config.PushToTalkControls` | `{ 0x4BC9DABB }` | Controls left enabled while the panel is open |
 | `Config.Ranges` | empty | Reserved frequency ranges: `min`, `max`, `label` (locale key) and the same rules as channels |

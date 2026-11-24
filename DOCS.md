@@ -1,4 +1,4 @@
-# rsg-radio – Docs (v3.3.0)
+# rsg-radio – Docs (v3.3.2)
 
 Technical reference for server owners and developers. For a short overview and install steps see [README.md](README.md).
 
@@ -90,7 +90,7 @@ Requires rsg-core 3.0.3+, rsg-inventory and **rsg-voice 3.1.3+** (3.1.3 binds th
 | `Config.FavoriteLabelLength` | `16` | Longest favorite name in characters |
 | `Config.Channels` | lawman, medic | Restricted channels, see [section 6](#6-restricted-channels) |
 | `Config.CheckInterval` | `10` | Seconds between checks that connected players still have the item and access (minimum 1) |
-| `Config.TransmitKeyLabel` | `'O'` | Text of the "Hold O to transmit" hint only. Keep in line with rsg-voice `Config.Radio.Key` |
+| `Config.TransmitKeyLabel` | `'O'` | Text of the "Hold O to transmit" hint, used only when rsg-voice cannot report its key (older rsg-voice, or `UseKeyMapping = false`). With rsg-voice 3.4.0+ the hint uses rsg-voice's `Config.Radio.Key` |
 | `Config.AllowPushToTalkWhileOpen` | `true` | While the panel is open: `SetNuiFocusKeepInput(true)` plus a control whitelist so voice keys keep working |
 | `Config.PushToTalkControls` | `{ 0x4BC9DABB }` | Controls left enabled while the panel is open (N, push-to-talk) |
 | `Config.Ranges` | `{}` | Reserved ranges: `min`, `max`, `label` (locale key) plus the channel rules `jobs`, `jobtypes`, `gangs`, `onduty`, `minGrade`, `permission`. See [18.1](#181-reserved-ranges-configranges) |

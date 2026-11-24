@@ -21,7 +21,7 @@ local function runPttWhitelist()
     DisableAllControlActions(0)
     DisableAllControlActions(1)
     DisableAllControlActions(2)
-    local list = Config.PushToTalkControls
+    local list = Config.PushToTalkControls or {}
     for i = 1, #list do
         EnableControlAction(0, list[i], true)
         EnableControlAction(1, list[i], true)
@@ -52,6 +52,12 @@ local function notify(key, nType, ...)
     RSGCore.Functions.Notify({ title = locale('notify_title'), description = locale(key, ...), type = nType, duration = 3000 })
 end
 
+-- Key name for the hint: rsg-voice knows the real default key, the config value is the fallback
+local function transmitKeyLabel()
+    local ok, key = pcall(function() return exports['rsg-voice']:GetRadioKeyLabel() end)
+    return (ok and type(key) == 'string' and key ~= '') and key or Config.TransmitKeyLabel
+end
+
 local function getStrings()
     return {
         title = locale('ui_title'), subtitle = locale('ui_subtitle'),
@@ -59,7 +65,7 @@ local function getStrings()
         frequency = locale('ui_frequency'), connect = locale('ui_connect'), disconnect = locale('ui_disconnect'),
         channels = locale('ui_channels'), noChannels = locale('ui_no_channels'),
         active = locale('ui_active'), join = locale('ui_join'),
-        hint = locale('ui_hint', Config.TransmitKeyLabel), members = locale('ui_members', '%s'),
+        hint = locale('ui_hint', transmitKeyLabel()), members = locale('ui_members', '%s'),
         close = locale('ui_close'), move = locale('ui_move'),
         favorites = locale('ui_favorites'), noFavorites = locale('ui_no_favorites'), favAdd = locale('ui_fav_add'),
         favRemove = locale('ui_fav_remove'), favLabel = locale('ui_fav_label'),
@@ -72,10 +78,16 @@ local function getStrings()
     }
 end
 
+-- A text box in the panel has focus: tell rsg-voice so typing an 'o' does not key the mic
+local function setTyping(state)
+    pcall(function() exports['rsg-voice']:SetRadioInputBlocked(state == true) end)
+end
+
 local function closeRadio()
     if not uiFocus then return end
     uiFocus, adminOpen = false, false
     applyNuiFocus(false)
+    setTyping(false)
     SendNUIMessage({ action = 'close' })
     TriggerServerEvent('rsg-radio:server:panelClosed')
 end
@@ -122,6 +134,11 @@ end)
 RegisterNUICallback('close', function(_, cb)
     closeRadio()
     cb('ok')
+end)
+
+RegisterNUICallback('typing', function(data, cb)
+    cb('ok')
+    if uiFocus then setTyping(type(data) == 'table' and data.state == true) end
 end)
 
 -- NUI callback that forwards a frequency (and optionally a favorite name) to a server event
@@ -231,14 +248,11 @@ adminAction('adminUnmute', 'rsg-radio:server:admin:unmute', function(d) return t
 adminAction('adminDeletePrivate', 'rsg-radio:server:admin:deletePrivate', function(d) return tonumber(d.freq) end)
 adminAction('adminClear', 'rsg-radio:server:admin:clearChannel', function(d) return tonumber(d.freq) end)
 
-RegisterNetEvent('RSGCore:Client:OnPlayerUnload', function()
-    closeRadio()
-end)
-
 AddEventHandler('onResourceStop', function(res)
     if res == GetCurrentResourceName() and uiFocus then
         uiFocus = false
         applyNuiFocus(false)
+        setTyping(false)
     end
 end)
 
@@ -411,12 +425,6 @@ RegisterNetEvent('RSGCore:Client:OnPlayerLoaded', function()
     SetTimeout(1000, function() loadSettings(RSGCore.Functions.GetPlayerData()) end)
 end)
 RegisterNetEvent('RSGCore:Player:SetPlayerData', function(pd) loadSettings(pd) end)
-RegisterNetEvent('RSGCore:Client:OnPlayerUnload', function()
-    hudData, hudTalkers, battery, signal = nil, {}, nil, 1.0
-    settings = { vol = defaultVolume(), muted = false }
-    applyVoice()
-    sendHud()
-end)
 AddEventHandler('onClientResourceStart', function(res)
     if res == 'rsg-voice' then SetTimeout(1500, applyVoice) end -- rsg-voice restarted: hand our settings over again
 end)
@@ -507,7 +515,15 @@ if HH.Enabled then
     end)
 end
 
-AddEventHandler('RSGCore:Client:OnPlayerUnload', removeHandheld)
+-- Character unloaded: close the panel, drop the handheld pose and reset the radio state
+RegisterNetEvent('RSGCore:Client:OnPlayerUnload', function()
+    closeRadio()
+    removeHandheld()
+    hudData, hudTalkers, battery, signal = nil, {}, nil, 1.0
+    settings = { vol = defaultVolume(), muted = false }
+    applyVoice()
+    sendHud()
+end)
 AddEventHandler('onResourceStop', function(res)
     if res == GetCurrentResourceName() then removeHandheld() end
 end)
